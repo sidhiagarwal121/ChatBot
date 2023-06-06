@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>Chat Application</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    .user{
+      margin-bottom: 44px;
+      cursor: pointer;
+    }
+    .chat-container{
+      margin-left: -910px;
+      height: 450px;
+      width: 750px;
+      background-color: rgb(197, 224, 233);
+      margin-top: 73px;
+      overflow: scroll;
+     
+  
+    }
+    .chat-section{
+      display: none;
+    }
+    .form{
+      margin-left: -910px;
+    }
+     #message{
+      height: 45px;
+      width: 275px;
+      margin-top: 20px;
+    }
+    .current-user-chat{
+      text-align: right;
+      margin: 12px;
+      }
+      .current-user-chat h5{
+        color: rgb(1, 1, 248);
+      }
+    .distance-user-chat{
+      text-align: left;
+      margin: 12px;
+      
+      
+
+    }
+   
+
+  </style>
+  </head>
+  <body>
+    <div class="wrapper d-flex align-items-stretch">
+			<nav id="sidebar">
+				<div class="custom-menu">
+					<button type="button" id="sidebarCollapse" class="btn btn-primary">
+	          <i class="fa fa-bars"></i>
+	          <span class="sr-only">Toggle Menu</span>
+	        </button>
+        </div>
+	  		<h1><a href="index.html" class="logo">Project Name</a></h1>
+        <ul class="list-unstyled components mb-5">
+          <li>
+              <a href="/dashboard"><span class="fa fa-user mr-3"></span> Dashboard</a>
+          </li>
+          <li>
+            <a href="/logout"><span class="fa fa-signout mr-3"></span>LogOut</a>
+          </li>
+        </ul>
+
+    	</nav>
+
+        <!-- Page Content  -->
+      <div id="content" class="p-4 p-md-5 pt-5">
+        <h1 style="color: rgb(20, 14, 14);font-size: 34px;">Hii,<%=user.name%></h1>
+        <div class="row">
+          <div class="col-md-3">
+            <ul class="list-group">
+              <%
+              if(users.length>0)
+              {
+                for(let i=0;i<users.length;i++){
+                %>
+                <div class="user">
+                  <li class="list-group-item list-group-item-dark user-list" style="height: 85px; display: flex;" data-id="<%=users[i]['_id']%>"> 
+                 
+                    <img src="<%='http://127.0.0.1:3000/'+users[i]['image']%>" alt="" height="45px" width="45px" style="border-radius: 50%; border: 3px solid black;">
+                    <h5 style="margin-left: 45px; margin-top: 8px;"><%=users[i]['name']%></h5>
+                  
+                 
+                </li>
+
+                </div>
+                
+                
+                <%
+              }
+              }
+              %>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div  >
+       
+        <div class="chat-section" >
+    
+          <div class="chat-container" >
+            <!-- <div class="current-user-chat">
+              <h5>Hii</h5>
+            </div>
+            <div class="distance-user-chat">
+              <h5>Hii</h5>
+            </div> -->
+
+          </div>
+          <div class="form">
+            <form action=""  id="chat-form">
+              <input type="text" name="message" placeholder="Enter your message" id="message" required class="border">
+              <input type="submit" class="btn btn-primary" value="Send">
+  
+  
+            </form>
+            
+          </div>
+          
+        </div>
+
+      </div>
+		</div>
+    <script>
+      
+      var sender_id='<%=user._id%>'
+      var receiver_id;
+      $(document).ready(function(){
+        $('.user-list').click(function()
+        {
+          var userId=$(this).attr('data-id')
+          receiver_id=userId
+          $('.chat-section').show();
+          socket.emit('existsChat',{sender_id:sender_id,receiver_id:receiver_id})
+        })
+
+      })
+      var socket=io('/user-namespace')
+
+      //chat save
+      $('#chat-form').submit(function(event)
+      {
+        event.preventDefault()
+        var message=$('#message').val()
+        $.ajax({
+          url:'/save-chat',
+          type:'POST',
+          data:{sender_id:sender_id,receiver_id:receiver_id,message:message},
+          success:function(response)
+          {
+            if(response.success)
+            {
+              console.log(response.data.message)
+              $('#message').val('')
+              let chat=response.data.message
+              let html=`<div class="current-user-chat">
+              <h5>`+chat+`</h5>
+            </div> `
+            $('.chat-container').append(html);
+            socket.emit('newChat',response.data)
+            scrollChat();
+            }
+            
+            else{
+              console.log(data.message)
+            }
+
+          }
+
+        })
+
+      })
+      socket.on('loadNewChat',function(data)
+      {
+        if(sender_id==data.receiver_id && receiver_id==data.sender_id )
+        {
+            let html=`<div class="distance-user-chat">
+            <h5>`+data.message+`</h5>
+            </div> `
+            $('.chat-container').append(html);
+            scrollChat()
+            
+
+        }
+    })
+    socket.on('loadChats',function(data)
+    {
+      $('.chat-container').html(' ');
+      var chats=data.chats;
+      let html='';
+      for(let x=0;x<chats.length;x++){
+        let addClass='';
+        if(chats[x]['sender_id']==sender_id)
+        {
+          addClass='current-user-chat'
+        }
+        else{
+          addClass='distance-user-chat'
+        }
+        html+=`
+        <div class='`+addClass+`'>
+            <h5>`+chats[x]['message']+`</h5>
+        </div> 
+        `
+      }
+      $('.chat-container').append(html)
+      scrollChat();
+
+    })
+    function scrollChat()
+    {
+      $('.chat-container').animate({
+        scrollTop:$('.chat-container').offset().top+$('.chat-container')[0].scrollHeight
+      },0)
+    
+      
+    }
+    </script>
+
+    <!-- <script src="js/jquery.min.js"></script> -->
+    
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
