@@ -11,14 +11,14 @@
   <script src="/socket.io/socket.io.js"></script>
   <style>
     .user{
-      margin-bottom: 44px;
+      
       cursor: pointer;
     }
     .chat-container{
       margin-left: -910px;
       height: 450px;
       width: 750px;
-      background-color: rgb(197, 224, 233);
+      background-color: rgb(244, 247, 248);
       margin-top: 73px;
       overflow: scroll;
      
@@ -36,18 +36,44 @@
       margin-top: 20px;
     }
     .current-user-chat{
-      text-align: right;
+      text-align: center;
+      background-color: rgb(149, 205, 228);
       margin: 12px;
+      width: 250px;
+      margin-left: 480px;
+      border-radius: 15px;
+      
       }
       .current-user-chat h5{
-        color: rgb(1, 1, 248);
+        color: rgb(255, 255, 255);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .distance-user-chat h5{
+        color: rgb(0, 0, 0);
+        font-family: Arial, Helvetica, sans-serif;
       }
     .distance-user-chat{
-      text-align: left;
+      text-align: center;
+      background-color: rgb(203, 205, 206);
       margin: 12px;
-      
+      width: 250px;
+      /* margin-left: 480px; */
+      border-radius: 15px;
       
 
+    }
+    .main{
+      background-color: #d4ddc4;
+      height:65%;
+      width: 250px;
+    }
+    .user-list{
+      background-color: #f1f8d0;
+    }
+    h1{
+      size: 45px;
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight:400;
     }
    
 
@@ -59,55 +85,60 @@
 				<div class="custom-menu">
 					<button type="button" id="sidebarCollapse" class="btn btn-primary">
 	          <i class="fa fa-bars"></i>
-	          <span class="sr-only">Toggle Menu</span>
+	          
 	        </button>
         </div>
-	  		<h1><a href="index.html" class="logo">Project Name</a></h1>
+	  		<h1><a href="index.html" class="logo" style="background-color: rgb(216, 145, 58);">Chat Application</a></h1>
         <ul class="list-unstyled components mb-5">
           <li>
               <a href="/dashboard"><span class="fa fa-user mr-3"></span> Dashboard</a>
           </li>
           <li>
-            <a href="/logout"><span class="fa fa-signout mr-3"></span>LogOut</a>
+            <a href="/logout"><span class="fa fa-sign-out mr-3"></span>LogOut</a>
           </li>
         </ul>
 
     	</nav>
 
+      
         <!-- Page Content  -->
       <div id="content" class="p-4 p-md-5 pt-5">
-        <h1 style="color: rgb(20, 14, 14);font-size: 34px;">Hii,<%=user.name%></h1>
+        <h1 >Hii,<%=user.name%></h1>
         <div class="row">
-          <div class="col-md-3">
-            <ul class="list-group">
-              <%
-              if(users.length>0)
-              {
-                for(let i=0;i<users.length;i++){
-                %>
-                <div class="user">
-                  <li class="list-group-item list-group-item-dark user-list" style="height: 85px; display: flex;" data-id="<%=users[i]['_id']%>"> 
-                 
-                    <img src="<%='http://127.0.0.1:3000/'+users[i]['image']%>" alt="" height="45px" width="45px" style="border-radius: 50%; border: 3px solid black;">
-                    <h5 style="margin-left: 45px; margin-top: 8px;"><%=users[i]['name']%></h5>
-                  
-                 
-                </li>
-
-                </div>
-                
-                
+          <div class="main">
+            <div >
+              <ul class="list-group">
                 <%
-              }
-              }
-              %>
-            </ul>
+                if(users.length>0)
+                {
+                  for(let i=0;i<users.length;i++){
+                  %>
+                  <div class="user">
+                    <li class="list-group-item  user-list " style="height: 85px; display: flex;" data-id="<%=users[i]['_id']%>"> 
+                   
+                      <img src="<%='http://127.0.0.1:3000/'+users[i]['image']%>" alt="" height="45px" width="45px" style="border-radius: 50%; border: 3px solid black;">
+                      <h5 style="margin-left: 45px; margin-top: 8px;"><%=users[i]['name']%></h5>
+                    
+                   
+                  </li>
+  
+                  </div>
+                  
+                  
+                  <%
+                }
+                }
+                %>
+              </ul>
+            </div>
+
           </div>
+          
         </div>
       </div>
       <div  >
-       
-        <div class="chat-section" >
+        
+       <div class="chat-section" >
     
           <div class="chat-container" >
             <!-- <div class="current-user-chat">
@@ -121,7 +152,7 @@
           <div class="form">
             <form action=""  id="chat-form">
               <input type="text" name="message" placeholder="Enter your message" id="message" required class="border">
-              <input type="submit" class="btn btn-primary" value="Send">
+              <input type="submit" class="btn btn-primary" value="Send" style="border-radius: 12px;">
   
   
             </form>
@@ -132,6 +163,7 @@
 
       </div>
 		</div>
+    
     <script>
       
       var sender_id='<%=user._id%>'
